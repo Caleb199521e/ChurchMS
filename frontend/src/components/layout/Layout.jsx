@@ -7,11 +7,13 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import SettingsIcon from '@mui/icons-material/Settings';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChurchIcon from '@mui/icons-material/Church';
 import SwitchAccount from '@mui/icons-material/SwitchAccount';
 import BusinessIcon from '@mui/icons-material/Business';
+import HistoryIcon from '@mui/icons-material/History';
 import Modal from '../common/Modal';
 
 const navItems = [
@@ -123,24 +125,47 @@ export default function Layout() {
               <SettingsIcon sx={{ fontSize: 20 }} />
               Users
             </NavLink>
+            <NavLink
+              to="/audit-logs"
+              onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all ${
+                  isActive ? 'bg-white text-brand font-semibold' : 'text-blue-100 hover:bg-white/10 hover:text-white'
+                }`
+              }
+            >
+              <HistoryIcon sx={{ fontSize: 20 }} />
+              Audit Logs
+            </NavLink>
           </>
         )}
       </nav>
 
       {/* User info */}
       <div className="px-4 py-4 border-t border-white/10">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 bg-brand-accent rounded-full flex items-center justify-center text-sm font-bold text-white">
+        <button 
+          onClick={() => navigate('/profile')}
+          className="w-full text-left flex items-center gap-3 mb-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
+        >
+          <div className="w-8 h-8 bg-brand-accent rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
             {user?.name?.[0]?.toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm font-medium truncate">{user?.name}</p>
             <p className="text-blue-300 text-xs capitalize">{user?.role?.replace('-', ' ')}</p>
           </div>
-        </div>
-        <button onClick={handleLogout} className="w-full text-left text-xs text-blue-300 hover:text-white transition-colors flex items-center gap-2 px-1 py-1">
-          <LogoutIcon sx={{ fontSize: 16 }} /> Sign out
         </button>
+        <div className="space-y-1">
+          <button 
+            onClick={() => navigate('/profile')}
+            className="w-full text-left text-xs text-blue-300 hover:text-white transition-colors flex items-center gap-2 px-2 py-2 rounded hover:bg-white/10"
+          >
+            <AccountCircleIcon sx={{ fontSize: 16 }} /> My Profile
+          </button>
+          <button onClick={handleLogout} className="w-full text-left text-xs text-blue-300 hover:text-white transition-colors flex items-center gap-2 px-2 py-2 rounded hover:bg-white/10">
+            <LogoutIcon sx={{ fontSize: 16 }} /> Sign out
+          </button>
+        </div>
       </div>
     </div>
   );

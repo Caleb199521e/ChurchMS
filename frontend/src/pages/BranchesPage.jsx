@@ -76,12 +76,12 @@ export default function BranchesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader 
-        title="Branches" 
-        subtitle="Manage all church branches"
-      />
-
       <div className="max-w-7xl mx-auto px-4 py-6">
+        <PageHeader 
+          title="Branches" 
+          subtitle="Manage all church branches"
+        />
+
         {/* Header with Button */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">All Branches</h2>
