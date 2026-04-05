@@ -1,0 +1,7 @@
+fullName,phone,email,gender,role,department,address,joinDate,notes
+John Kwame Doe,0244-123-456,john.doe@example.com,male,member,Music,123 Main Street Accra,2024-01-15,Active in choir
+Jane Amelia Smith,0209-876-543,jane.smith@example.com,female,deacon,Women Ministry,456 Oak Avenue Kumasi,2023-06-20,Leads prayer group
+Kofi Emmanuel Mensah,0271-234-567,kofi.mensah@example.com,male,elder,Leadership,789 Pine Road Takoradi,2022-03-10,Long-time member
+Mary Abena Boateng,0264-345-678,mary.boateng@example.com,female,member,Children's Church,321 Elm Street Tema,2024-02-01,Recently joined
+Samuel Nii Owusu,0267-456-789,samuel.owusu@example.com,male,pastor,Leadership,654 Birch Lane Cape Coast,2020-05-12,Senior pastor
+Rebecca Esi Adu,0201-567-890,rebecca.adu@example.com,female,leader,Youth Ministry,987 Maple Drive Sekondi,2023-09-05,Youth coordinator

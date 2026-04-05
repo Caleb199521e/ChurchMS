@@ -1,0 +1,7 @@
+name,phone,email,firstVisitDate,invitedBy,address,notes
+Ama Kuffour,0244-567-890,ama.kuffour@example.com,2024-02-10,Kwame Asante,123 Visitor Lane Accra,First time attendee
+Benjamin Ofori,0209-678-901,benjamin.ofori@example.com,2024-02-15,Jane Smith,456 Guest Street Kumasi,Invited by Jane
+Cecilia Mensah,0271-789-012,cecilia.mensah@example.com,2024-02-20,John Doe,789 Friend Avenue Takoradi,Came with friend
+David Boateng,0264-890-123,david.boateng@example.com,2024-03-05,,321 Newcomer Road Tema,Walk-in visitor
+Esther Adu,0267-901-234,esther.adu@example.com,2024-03-10,pastor,654 Guest Lane Cape Coast,Referred by church
+Kwesi Appiah,0201-012-345,kwesi.appiah@example.com,2024-03-15,Ama Johnson,987 Visitor Drive Sekondi,Interested in youth group
