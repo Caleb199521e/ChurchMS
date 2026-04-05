@@ -6,7 +6,7 @@ const Member = require('../models/Member');
 exports.getAttendance = async (req, res, next) => {
   try {
     const { from, to, serviceType, page = 1, limit = 20 } = req.query;
-    const query = {};
+    const query = { branchId: req.branchId };
 
     if (serviceType) query.serviceType = serviceType;
     if (from || to) {
@@ -64,8 +64,8 @@ exports.markAttendance = async (req, res, next) => {
 
     // Upsert - if attendance exists for this service+date, update it
     const record = await Attendance.findOneAndUpdate(
-      { date: serviceDate, serviceType },
-      { serviceTitle, members, visitors, notes, markedBy: req.user._id },
+      { date: serviceDate, serviceType, branchId: req.branchId },
+      { serviceTitle, members, visitors, notes, branchId: req.branchId, markedBy: req.user._id },
       { new: true, upsert: true, runValidators: true }
     );
 
@@ -92,7 +92,7 @@ exports.deleteAttendance = async (req, res, next) => {
 exports.getAttendanceSummary = async (req, res, next) => {
   try {
     const { from, to } = req.query;
-    const matchQuery = {};
+    const matchQuery = { branchId: req.branchId };
 
     if (from || to) {
       matchQuery.date = {};

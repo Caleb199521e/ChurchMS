@@ -8,7 +8,7 @@ const fs = require('fs');
 exports.getVisitors = async (req, res, next) => {
   try {
     const { search, converted, page = 1, limit = 20 } = req.query;
-    const query = {};
+    const query = { branchId: req.branchId };
 
     if (search) {
       query.$or = [
@@ -36,7 +36,8 @@ exports.getVisitors = async (req, res, next) => {
 // @route   POST /api/visitors
 exports.createVisitor = async (req, res, next) => {
   try {
-    const visitor = await Visitor.create(req.body);
+    const visitorData = { ...req.body, branchId: req.branchId };
+    const visitor = await Visitor.create(visitorData);
     res.status(201).json({ success: true, data: visitor });
   } catch (err) {
     next(err);
@@ -64,11 +65,17 @@ exports.convertToMember = async (req, res, next) => {
     const visitor = await Visitor.findById(req.params.id);
     if (!visitor) return res.status(404).json({ success: false, message: 'Visitor not found.' });
 
-    // Create a new member from visitor data
+    // Verify visitor belongs to user's branch
+    if (visitor.branchId.toString() !== req.branchId) {
+      return res.status(403).json({ success: false, message: 'Unauthorized access.' });
+    }
+
+    // Create a new member from visitor data with branchId
     const member = await Member.create({
       fullName: visitor.name,
       phone: visitor.phone,
       email: visitor.email,
+      branchId: visitor.branchId,
       joinDate: new Date(),
       ...req.body // allow extra member fields to be passed
     });
@@ -176,6 +183,7 @@ exports.bulkCreateVisitors = async (req, res, next) => {
           invitedBy: visitorData.invitedBy?.trim() || undefined,
           address: visitorData.address?.trim() || undefined,
           notes: visitorData.notes?.trim() || undefined,
+          branchId: req.branchId,
         });
 
         results.created.push({

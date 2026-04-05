@@ -61,7 +61,7 @@ exports.getMembers = async (req, res, next) => {
   try {
     const { search, department, role, page = 1, limit = 20, isActive } = req.query;
 
-    const query = {};
+    const query = { branchId: req.branchId };
 
     if (search) {
       query.$or = [
@@ -112,7 +112,8 @@ exports.getMember = async (req, res, next) => {
 // @route   POST /api/members
 exports.createMember = async (req, res, next) => {
   try {
-    const member = await Member.create(req.body);
+    const memberData = { ...req.body, branchId: req.branchId };
+    const member = await Member.create(memberData);
     res.status(201).json({ success: true, data: member });
   } catch (err) {
     next(err);
@@ -150,7 +151,7 @@ exports.deleteMember = async (req, res, next) => {
 // @route   GET /api/members/all
 exports.getAllMembers = async (req, res, next) => {
   try {
-    const members = await Member.find({ isActive: true })
+    const members = await Member.find({ isActive: true, branchId: req.branchId })
       .select('fullName phone department')
       .populate('department', 'name')
       .sort({ fullName: 1 });
@@ -200,6 +201,7 @@ exports.bulkCreateMembers = async (req, res, next) => {
           address: memberData.address?.trim() || undefined,
           joinDate: memberData.joinDate || new Date(),
           notes: memberData.notes?.trim() || undefined,
+          branchId: req.branchId,
           isActive: true
         });
 

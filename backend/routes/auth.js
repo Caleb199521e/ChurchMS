@@ -5,9 +5,9 @@ const { protect, authorize } = require('../middleware/auth');
 
 router.post('/login', login);
 router.get('/me', protect, getMe);
-router.post('/register', protect, authorize('admin'), register);
-router.get('/users', protect, authorize('admin'), getUsers);
-router.put('/users/:id', protect, authorize('admin'), updateUser);
+router.post('/register', protect, authorize('super-admin'), register);
+router.get('/users', protect, authorize('super-admin'), getUsers);
+router.put('/users/:id', protect, authorize('super-admin'), updateUser);
 router.put('/change-password', protect, changePassword);
 
 module.exports = router;

@@ -7,7 +7,7 @@ exports.getAnnouncements = async (req, res, next) => {
     const { page = 1, limit = 10 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const query = { isActive: true };
+    const query = { isActive: true, branchId: req.branchId };
     // Filter out expired announcements
     query.$or = [{ expiresAt: null }, { expiresAt: { $gte: new Date() } }];
 
@@ -30,6 +30,7 @@ exports.createAnnouncement = async (req, res, next) => {
   try {
     const announcement = await Announcement.create({
       ...req.body,
+      branchId: req.branchId,
       createdBy: req.user._id
     });
     res.status(201).json({ success: true, data: announcement });

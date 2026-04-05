@@ -4,6 +4,7 @@ const VisitorSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   phone: { type: String, trim: true },
   email: { type: String, trim: true },
+  branchId: { type: mongoose.Schema.Types.ObjectId, ref: 'Branch', required: true },
   firstVisitDate: { type: Date, default: Date.now },
   invitedBy: { type: String }, // name of member who invited them
   address: { type: String },

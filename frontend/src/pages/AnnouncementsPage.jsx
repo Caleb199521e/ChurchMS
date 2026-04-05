@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import Modal from '../components/common/Modal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import PageHeader from '../components/common/PageHeader';
 import { toast } from '../components/common/Toaster';
 import { useAuth } from '../context/AuthContext';
@@ -89,9 +90,7 @@ export default function AnnouncementsPage() {
       />
 
       {loading ? (
-        <div className="space-y-3">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-28 bg-gray-100 rounded-xl animate-pulse" />)}
-        </div>
+        <LoadingSpinner text="Loading announcements..." />
       ) : announcements.length === 0 ? (
         <div className="card text-center py-14">
           <div className="text-4xl mb-3"><CampaignIcon sx={{ fontSize: 60, color: '#9ca3af' }} /></div>

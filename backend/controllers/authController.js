@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { logAudit } = require('../middleware/audit');
 
 const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, {
   expiresIn: process.env.JWT_EXPIRE || '7d'
@@ -15,7 +16,7 @@ exports.login = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Please provide email and password.' });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate('branchId');
     if (!user || !user.isActive) {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
     }
@@ -26,10 +27,49 @@ exports.login = async (req, res, next) => {
     }
 
     const token = signToken(user._id);
+    
+    // Prepare response based on role
+    const userResponse = { 
+      id: user._id, 
+      name: user.name, 
+      email: user.email, 
+      role: user.role,
+      branchId: user.branchId?._id || user.branchId  // Extract _id if populated, otherwise use as-is
+    };
+
+    // For super-admin, include available branches
+    if (user.role === 'super-admin') {
+      const Branch = require('../models/Branch');
+      const branches = await Branch.find({ isActive: true }).select('_id name');
+      
+      // Log super-admin login
+      await logAudit({
+        userId: user._id,
+        userName: user.name,
+        userEmail: user.email,
+        action: 'LOGIN',
+        resourceType: 'User',
+        resourceId: user._id,
+        resourceName: user.name,
+        ipAddress: req.ip || req.connection.remoteAddress,
+        userAgent: req.get('user-agent'),
+        status: 'SUCCESS'
+      });
+      
+      return res.json({
+        success: true,
+        token,
+        user: userResponse,
+        branches,
+        message: 'Please select a branch to manage'
+      });
+    }
+
+    // For branch staff, branchId is auto-populated
     res.json({
       success: true,
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+      user: userResponse
     });
   } catch (err) {
     next(err);
@@ -39,7 +79,17 @@ exports.login = async (req, res, next) => {
 // @desc    Get current user
 // @route   GET /api/auth/me
 exports.getMe = async (req, res) => {
-  res.json({ success: true, user: req.user });
+  const user = req.user;
+  const response = { success: true, user };
+  
+  // For super-admin, also return available branches
+  if (user.role === 'super-admin') {
+    const Branch = require('../models/Branch');
+    const branches = await Branch.find({ isActive: true }).select('_id name');
+    response.branches = branches;
+  }
+  
+  res.json(response);
 };
 
 // @desc    Create user (admin only)

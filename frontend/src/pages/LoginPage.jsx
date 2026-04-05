@@ -1,20 +1,30 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { CheckCircle } from '@mui/icons-material';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, selectBranch } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [branches, setBranches] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await login(form.email, form.password);
+      const result = await login(form.email, form.password);
+      
+      // If result has selectBranch property, show branch selection screen
+      if (result?.selectBranch && result?.branches) {
+        setBranches(result.branches);
+        return;
+      }
+      
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Check your credentials.');
@@ -23,6 +33,81 @@ export default function LoginPage() {
     }
   };
 
+  const handleSelectBranch = (branchId) => {
+    selectBranch(branchId);
+    navigate('/');
+  };
+
+  // Branch Selection Screen
+  if (branches) {
+    return (
+      <div className="min-h-screen bg-brand flex flex-col items-center justify-center p-4">
+        <div className="absolute inset-0 overflow-hidden opacity-5 pointer-events-none">
+          <div className="absolute -top-20 -left-20 w-96 h-96 bg-white rounded-full" />
+          <div className="absolute bottom-10 right-10 w-64 h-64 bg-white rounded-full" />
+        </div>
+
+        <div className="relative w-full max-w-2xl">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-accent rounded-2xl text-3xl mb-4 shadow-lg">
+              ✝️
+            </div>
+            <h1 className="text-2xl font-bold text-white">Select Branch</h1>
+            <p className="text-blue-200 text-sm mt-1">Choose a branch to manage</p>
+          </div>
+
+          {/* Branch Grid */}
+          <div className="bg-white rounded-2xl shadow-2xl p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {branches.map(branch => (
+                <button
+                  key={branch._id}
+                  onClick={() => handleSelectBranch(branch._id)}
+                  className={`p-6 rounded-xl border-2 transition-all text-left ${
+                    selectedBranch === branch._id
+                      ? 'border-brand-accent bg-blue-50'
+                      : 'border-gray-200 bg-gray-50 hover:border-brand hover:bg-blue-50'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-800">{branch.name}</h3>
+                      {branch.email && <p className="text-sm text-gray-600">{branch.email}</p>}
+                      {branch.phone && <p className="text-sm text-gray-600">{branch.phone}</p>}
+                    </div>
+                    {selectedBranch === branch._id && (
+                      <CheckCircle sx={{ color: '#3b82f6' }} />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => handleSelectBranch(selectedBranch || branches[0]._id)}
+              disabled={!selectedBranch && !branches.length}
+              className="btn-primary w-full py-3 text-base mt-6"
+            >
+              Continue
+            </button>
+
+            <button
+              onClick={() => {
+                setBranches(null);
+                setForm({ email: '', password: '' });
+              }}
+              className="w-full py-2 text-gray-600 hover:text-gray-800 mt-2"
+            >
+              Back to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Login Screen
   return (
     <div className="min-h-screen bg-brand flex flex-col items-center justify-center p-4">
       {/* Background pattern */}

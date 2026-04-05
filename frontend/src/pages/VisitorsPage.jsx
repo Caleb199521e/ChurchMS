@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 import Modal from '../components/common/Modal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import { toast } from '../components/common/Toaster';
@@ -148,9 +149,7 @@ export default function VisitorsPage() {
       </div>
 
       {loading ? (
-        <div className="space-y-3">
-          {[...Array(5)].map((_, i) => <div key={i} className="h-20 bg-gray-100 rounded-xl animate-pulse" />)}
-        </div>
+        <LoadingSpinner text="Loading visitors..." />
       ) : visitors.length === 0 ? (
         <div className="card text-center py-14">
           <div className="mb-3"><GroupsIcon sx={{ fontSize: 60, color: '#d1d5db' }} /></div>

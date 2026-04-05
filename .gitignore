@@ -1,13 +1,16 @@
-# Environment Variables
+# Environment Variables & Secrets
 .env
 .env.local
-.env.*.local
+.env.development
 .env.production
+.env.*.local
+.env.test
 
 # Dependencies
 node_modules/
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
 
 # IDE & Editor
 .vscode/
@@ -15,10 +18,9 @@ yarn.lock
 *.swp
 *.swo
 *~
-.DS_Store
-Thumbs.db
 *.sublime-project
 *.sublime-workspace
+.settings/
 
 # Logs
 logs/
@@ -26,6 +28,8 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Build & Dist
 dist/
@@ -33,6 +37,7 @@ build/
 .next/
 out/
 coverage/
+.nuxt/
 
 # OS Files
 .DS_Store
@@ -41,13 +46,47 @@ coverage/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+desktop.ini
 
-# IDE Caches
+# IDE Caches & Temporary
 .cache/
 .eclipse
-
-# Temporary files
 *.tmp
+*.temp
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+mongodb/
+
+# Ngrok & Local Tunneling
+.ngrok
+ngrok.exe
+
+# OS & Process
+*.pid
+*.seed
+*.pid.lock
+
+# Development tools
+.env.example
+.DS_Store
+.env.sample
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Distribution
+*.tar.gz
+*.zip
+
+# Testing artifacts
+.mocha
+*.lcov
+traces/
 *.temp
 *.bak
 *.swp
@@ -77,3 +116,6 @@ mongo-data/
 .LSOverride
 backend/.env.example
 frontend/.env.example
+setup-ngrok.sh
+NGROK_GUIDE.md
+setup-ngrok.bat

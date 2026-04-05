@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import PeopleIcon from '@mui/icons-material/People';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -45,11 +46,7 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="card animate-pulse h-24 bg-gray-100" />
-          ))}
-        </div>
+        <LoadingSpinner text="Loading statistics..." />
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <StatCard icon={PeopleIcon} label="Total Members" value={stats?.totalMembers} to="/members" />
@@ -68,9 +65,7 @@ export default function Dashboard() {
             <Link to="/announcements" className="text-xs text-brand hover:underline font-medium">View all</Link>
           </div>
           {loading ? (
-            <div className="space-y-3">
-              {[...Array(3)].map((_, i) => <div key={i} className="h-14 bg-gray-100 rounded-lg animate-pulse" />)}
-            </div>
+            <LoadingSpinner size="sm" text="Loading..." />
           ) : stats?.latestAnnouncements?.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-6">No announcements yet.</p>
           ) : (
@@ -92,9 +87,7 @@ export default function Dashboard() {
             <Link to="/visitors" className="text-xs text-brand hover:underline font-medium">View all</Link>
           </div>
           {loading ? (
-            <div className="space-y-3">
-              {[...Array(4)].map((_, i) => <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse" />)}
-            </div>
+            <LoadingSpinner size="sm" text="Loading..." />
           ) : stats?.recentVisitors?.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-6">No recent visitors.</p>
           ) : (

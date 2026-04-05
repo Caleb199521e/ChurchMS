@@ -1,25 +1,74 @@
 # Environment variables with secrets
 .env
 .env.local
+.env.development
 .env.production
+.env.test
+.env*.local
 
 # Dependencies
 node_modules/
 package-lock.json
+pnpm-lock.yaml
+yarn.lock
 
 # Logs
 logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Database & Backups
+*.db
+*.sqlite
+*.sqlite3
+mongodb/
+backups/
+*.backup
 
 # OS
 .DS_Store
+.DS_Store?
 Thumbs.db
+desktop.ini
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 
 # IDE
 .vscode/
 .idea/
+.settings/
+*.swp
+*.swo
+*~
 
-# Temporary
+# Temporary files
 *.tmp
+*.temp
 .cache/
+
+# Ngrok & Tunneling
+.ngrok
+ngrok.exe
+
+# Development
+test.js
+.mocha
+*.lcov
+traces/
+
+# Uploads & Temp
+uploads/temp/
+temp/
+*.pid
+*.seed
+*.lock
+
+# Backups
+*.bak
+*.backup
+*~
