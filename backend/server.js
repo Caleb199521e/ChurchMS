@@ -18,6 +18,7 @@ app.use(morgan('dev'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/branches', require('./routes/branches'));
 app.use('/api/audit-logs', require('./routes/auditLogs'));
+app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/members', require('./routes/members'));
 app.use('/api/attendance', require('./routes/attendance'));
 app.use('/api/announcements', require('./routes/announcements'));

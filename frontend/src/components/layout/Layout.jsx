@@ -14,6 +14,7 @@ import ChurchIcon from '@mui/icons-material/Church';
 import SwitchAccount from '@mui/icons-material/SwitchAccount';
 import BusinessIcon from '@mui/icons-material/Business';
 import HistoryIcon from '@mui/icons-material/History';
+import InsightsIcon from '@mui/icons-material/Insights';
 import Modal from '../common/Modal';
 
 const navItems = [
@@ -136,6 +137,18 @@ export default function Layout() {
             >
               <HistoryIcon sx={{ fontSize: 20 }} />
               Audit Logs
+            </NavLink>
+            <NavLink
+              to="/analytics"
+              onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all ${
+                  isActive ? 'bg-white text-brand font-semibold' : 'text-blue-100 hover:bg-white/10 hover:text-white'
+                }`
+              }
+            >
+              <InsightsIcon sx={{ fontSize: 20 }} />
+              Analytics
             </NavLink>
           </>
         )}

@@ -16,6 +16,8 @@ export default function BranchesPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [assignMembersTarget, setAssignMembersTarget] = useState(null);
+  const [assignMembersModalOpen, setAssignMembersModalOpen] = useState(false);
 
   useEffect(() => {
     fetchBranches();
@@ -169,6 +171,16 @@ export default function BranchesPage() {
                   {/* Actions */}
                   <div className="flex gap-2 pt-4 border-t border-gray-200">
                     <button
+                      onClick={() => {
+                        setAssignMembersTarget(branch);
+                        setAssignMembersModalOpen(true);
+                      }}
+                      className="flex-1 py-2 px-3 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2"
+                    >
+                      <PeopleIcon sx={{ fontSize: 16 }} />
+                      Assign Members
+                    </button>
+                    <button
                       onClick={() => setDeleteTarget(branch)}
                       className="flex-1 py-2 px-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2"
                     >
@@ -189,6 +201,18 @@ export default function BranchesPage() {
         onClose={() => setCreateModalOpen(false)}
         onSubmit={handleCreateBranch}
       />
+
+      {/* Assign Members Modal */}
+      {assignMembersTarget && (
+        <AssignMembersModal
+          isOpen={assignMembersModalOpen}
+          onClose={() => {
+            setAssignMembersModalOpen(false);
+            setAssignMembersTarget(null);
+          }}
+          branch={assignMembersTarget}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       <ConfirmDialog
@@ -323,3 +347,184 @@ function CreateBranchModal({ open, onClose, onSubmit }) {
     </Modal>
   );
 }
+
+function AssignMembersModal({ isOpen, onClose, branch }) {
+  const [members, setMembers] = useState([]);
+  const [allMembers, setAllMembers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMemberId, setSelectedMemberId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen && branch) {
+      fetchData();
+    }
+  }, [isOpen, branch]);
+
+  const fetchData = async () => {
+    setFetching(true);
+    try {
+      // Fetch members already in this branch
+      const res1 = await api.get(`/branches/${branch._id}/members`);
+      setMembers(res1.data.data);
+      
+      // Fetch all members by getting from /members endpoint
+      const res2 = await api.get('/members?limit=1000');
+      setAllMembers(res2.data.data || []);
+      
+      setSelectedMemberId('');
+      setSearchQuery('');
+      setError('');
+    } catch (err) {
+      toast.error('Failed to load members');
+      setError(err.response?.data?.message || 'Failed to load members');
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const filteredMembers = allMembers.filter(m => 
+    m.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (m.phone && m.phone.includes(searchQuery)) ||
+    (m.email && m.email.toLowerCase().includes(searchQuery))
+  );
+
+  const handleAssignMember = async () => {
+    if (!selectedMemberId) {
+      setError('Please select a member');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await api.post(`/branches/${branch._id}/members`, { memberId: selectedMemberId });
+      toast.success('Member assigned to branch successfully!');
+      setSelectedMemberId('');
+      setSearchQuery('');
+      await fetchData();
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Failed to assign member';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={`Assign Members to ${branch?.name}`} size="lg">
+      <div className="space-y-4">
+        {/* Current Members List */}
+        <div>
+          <h4 className="font-semibold text-gray-800 mb-3">Members in this branch ({members.length})</h4>
+          {fetching ? (
+            <div className="text-center py-4 text-gray-500">Loading members...</div>
+          ) : members.length === 0 ? (
+            <div className="text-center py-4 text-gray-500 bg-gray-50 rounded">
+              No members assigned yet
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {members.map(member => (
+                <div key={member._id} className="p-3 bg-gray-50 rounded-lg flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-gray-900">{member.fullName}</p>
+                    <p className="text-xs text-gray-500">{member.phone || member.email || 'No contact'}</p>
+                  </div>
+                  <span className="badge bg-blue-100 text-blue-800 capitalize">{member.role}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div className="border-t my-6"></div>
+
+        {/* Assign New Member */}
+        <div>
+          <h4 className="font-semibold text-gray-800 mb-3">Assign New Member</h4>
+          
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded p-3 mb-4 text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {/* Search Box */}
+            <div>
+              <label className="label">Search Members</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="Search by name, phone, or email..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSelectedMemberId('');
+                }}
+              />
+            </div>
+
+            {/* Members List */}
+            <div>
+              <label className="label">Select Member to Assign</label>
+              {fetching ? (
+                <div className="text-center py-4 text-gray-500 bg-gray-50 rounded">Loading...</div>
+              ) : filteredMembers.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-gray-50 rounded">
+                  {searchQuery ? 'No members found' : 'No members available'}
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg">
+                  {filteredMembers.map(member => (
+                    <label
+                      key={member._id}
+                      className="p-3 hover:bg-blue-50 cursor-pointer flex items-center gap-3 border-b last:border-b-0"
+                    >
+                      <input
+                        type="radio"
+                        name="memberSelect"
+                        value={member._id}
+                        checked={selectedMemberId === member._id}
+                        onChange={(e) => setSelectedMemberId(e.target.value)}
+                        className="w-4 h-4 text-brand"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 text-sm">{member.fullName}</p>
+                        <p className="text-xs text-gray-500">{member.phone || member.email || 'No contact'}</p>
+                      </div>
+                      <span className="badge bg-gray-100 text-gray-700 capitalize text-xs">{member.role}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 py-2 px-4 bg-gray-200 text-gray-800 rounded-lg font-medium hover:bg-gray-300 transition"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={handleAssignMember}
+                disabled={loading || !selectedMemberId}
+                className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Assigning...' : 'Assign Member'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+

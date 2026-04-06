@@ -10,7 +10,9 @@ const {
   deleteBranch,
   assignStaffToBranch,
   getBranchStaff,
-  removeStaffFromBranch
+  removeStaffFromBranch,
+  getBranchMembers,
+  assignMemberToBranch
 } = require('../controllers/branchController');
 
 const router = express.Router();
@@ -31,5 +33,9 @@ router.put('/:id', branchAccess, auditMiddleware('UPDATE', 'Branch'), updateBran
 router.post('/:id/staff', branchAccess, auditMiddleware('ASSIGN_STAFF', 'Branch'), assignStaffToBranch);
 router.get('/:id/staff', branchAccess, getBranchStaff);
 router.delete('/:id/staff/:userId', branchAccess, auditMiddleware('REMOVE_STAFF', 'Branch'), removeStaffFromBranch);
+
+// Member assignment (super-admin only)
+router.get('/:id/members', authorize('super-admin'), getBranchMembers);
+router.post('/:id/members', authorize('super-admin'), auditMiddleware('UPDATE', 'Member'), assignMemberToBranch);
 
 module.exports = router;

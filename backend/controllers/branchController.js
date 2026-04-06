@@ -409,6 +409,106 @@ exports.removeStaffFromBranch = async (req, res) => {
   }
 };
 
+// @desc    Get members in branch
+// @route   GET /api/branches/:id/members
+// @access  Super Admin
+exports.getBranchMembers = async (req, res) => {
+  try {
+    const user = req.user;
+    const { id } = req.params;
+
+    // Only super-admin can view all members across branches
+    if (user.role !== 'super-admin') {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Only super-admin can view members across branches' 
+      });
+    }
+
+    const branch = await Branch.findById(id);
+    if (!branch) {
+      return res.status(404).json({ success: false, message: 'Branch not found' });
+    }
+
+    const Member = require('../models/Member');
+    const members = await Member.find({ 
+      branchId: id, 
+      isActive: true 
+    }).select('fullName phone email role department');
+
+    res.status(200).json({ success: true, data: members });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Assign member to branch
+// @route   POST /api/branches/:id/members
+// @access  Super Admin
+exports.assignMemberToBranch = async (req, res) => {
+  try {
+    const user = req.user;
+    const { id } = req.params;
+    const { memberId } = req.body;
+
+    // Only super-admin can assign members
+    if (user.role !== 'super-admin') {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Only super-admin can assign members to branches' 
+      });
+    }
+
+    if (!memberId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Member ID is required' 
+      });
+    }
+
+    const branch = await Branch.findById(id);
+    if (!branch) {
+      return res.status(404).json({ success: false, message: 'Branch not found' });
+    }
+
+    const Member = require('../models/Member');
+    const member = await Member.findById(memberId);
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Member not found' });
+    }
+
+    const oldBranchId = member.branchId;
+
+    // Assign to branch
+    member.branchId = id;
+    await member.save();
+
+    // Log audit
+    if (req.auditLog) {
+      await logAudit({
+        ...req.auditLog,
+        action: 'UPDATE',
+        resourceType: 'Member',
+        resourceId: memberId,
+        resourceName: member.fullName,
+        changes: {
+          before: { branchId: oldBranchId },
+          after: { branchId: id }
+        },
+        status: 'SUCCESS'
+      });
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      message: 'Member assigned to branch successfully',
+      data: member 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Delete branch and all related data
 // @route   DELETE /api/branches/:id
 // @access  Super Admin
