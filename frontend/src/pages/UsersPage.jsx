@@ -3,6 +3,7 @@ import api from '../utils/api';
 import Modal from '../components/common/Modal';
 import PageHeader from '../components/common/PageHeader';
 import { toast } from '../components/common/Toaster';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const emptyForm = { name: '', email: '', password: '', role: 'staff' };
 
@@ -13,6 +14,7 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -124,8 +126,17 @@ export default function UsersPage() {
           {!editingUser && (
             <div>
               <label className="label">Password *</label>
-              <input type="password" className="input" placeholder="Min 6 characters" value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })} minLength={6} />
+              <div className="relative">
+                <input type={showPassword ? 'text' : 'password'} className="input pr-10" placeholder="Min 6 characters" value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })} minLength={6} />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
+                >
+                  {showPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+                </button>
+              </div>
             </div>
           )}
           <div>

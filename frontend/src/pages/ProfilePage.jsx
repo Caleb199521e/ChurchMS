@@ -7,6 +7,7 @@ import { toast } from '../components/common/Toaster';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import EmailIcon from '@mui/icons-material/Email';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -18,6 +19,11 @@ export default function ProfilePage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPasswords, setShowPasswords] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false
+  });
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -160,41 +166,68 @@ export default function ProfilePage() {
 
           <div>
             <label className="label">Current Password *</label>
-            <input
-              type="password"
-              name="currentPassword"
-              className="input"
-              placeholder="Enter your current password"
-              value={passwordForm.currentPassword}
-              onChange={handlePasswordChange}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPasswords.currentPassword ? 'text' : 'password'}
+                name="currentPassword"
+                className="input pr-10"
+                placeholder="Enter your current password"
+                value={passwordForm.currentPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswords({...showPasswords, currentPassword: !showPasswords.currentPassword})}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
+              >
+                {showPasswords.currentPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+              </button>
+            </div>
           </div>
 
           <div>
             <label className="label">New Password *</label>
-            <input
-              type="password"
-              name="newPassword"
-              className="input"
-              placeholder="Enter new password (min. 6 characters)"
-              value={passwordForm.newPassword}
-              onChange={handlePasswordChange}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPasswords.newPassword ? 'text' : 'password'}
+                name="newPassword"
+                className="input pr-10"
+                placeholder="Enter new password (min. 6 characters)"
+                value={passwordForm.newPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswords({...showPasswords, newPassword: !showPasswords.newPassword})}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
+              >
+                {showPasswords.newPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+              </button>
+            </div>
           </div>
 
           <div>
             <label className="label">Confirm New Password *</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              className="input"
-              placeholder="Confirm your new password"
-              value={passwordForm.confirmPassword}
-              onChange={handlePasswordChange}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPasswords.confirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                className="input pr-10"
+                placeholder="Confirm your new password"
+                value={passwordForm.confirmPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswords({...showPasswords, confirmPassword: !showPasswords.confirmPassword})}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
+              >
+                {showPasswords.confirmPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+              </button>
+            </div>
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
